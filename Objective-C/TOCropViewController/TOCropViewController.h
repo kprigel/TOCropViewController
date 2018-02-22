@@ -97,6 +97,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
 
 @interface TOCropViewController : UIViewController
 
+
 /**
  The original, uncropped image that was passed to this controller.
  */
@@ -112,6 +113,8 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerToolbarPosition) {
  cropped image, as well as crop information.
  */
 @property (nullable, nonatomic, weak) id<TOCropViewControllerDelegate> delegate;
+
+@property (nonatomic, assign) BOOL forceHideStatusBar;
 
 /**
  If true, when the user hits 'Done', a UIActivityController will appear

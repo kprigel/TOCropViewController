@@ -52,6 +52,9 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 @property (nonatomic, assign) BOOL navigationBarHidden;
 @property (nonatomic, assign) BOOL toolbarHidden;
 
+/* Save status bar hidden before showing this view controller to restore after dismissing. */
+@property (nonatomic, assign) BOOL statusBarWasHidden;
+
 /* State for whether content is being laid out vertically or horizontally */
 @property (nonatomic, readonly) BOOL verticalLayout;
 
@@ -143,7 +146,15 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     // so we can manually control the status bar fade out timing
     if (animated) {
         self.inTransition = YES;
-        [self setNeedsStatusBarAppearanceUpdate];
+        if (self.forceHideStatusBar) {
+            self.statusBarWasHidden = [UIApplication sharedApplication].statusBarHidden;
+            [[UIApplication sharedApplication] setStatusBarHidden:YES
+                                                    withAnimation:UIStatusBarAnimationSlide];
+        } else {
+
+       
+        
+            [self setNeedsStatusBarAppearanceUpdate];}
     }
     
     // If this controller is pushed onto a navigation stack, set flags noting the
@@ -213,7 +224,12 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     
     // Set the transition flag again so we can defer the status bar
     self.inTransition = YES;
-    [UIView animateWithDuration:0.5f animations:^{ [self setNeedsStatusBarAppearanceUpdate]; }];
+    if (self.forceHideStatusBar) {
+        [[UIApplication sharedApplication] setStatusBarHidden:self.statusBarWasHidden
+                                                withAnimation:UIStatusBarAnimationSlide];
+    } else {
+        [UIView animateWithDuration:0.5f animations:^{ [self setNeedsStatusBarAppearanceUpdate]; }];
+    }
     
     // Restore the navigation controller to its state before we were presented
     if (self.navigationController) {
@@ -228,7 +244,9 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     
     // Reset the state once the view has gone offscreen
     self.inTransition = NO;
-    [self setNeedsStatusBarAppearanceUpdate];
+    if (!self.forceHideStatusBar) {
+        [self setNeedsStatusBarAppearanceUpdate];
+    }
 }
 
 #pragma mark - Status Bar -
